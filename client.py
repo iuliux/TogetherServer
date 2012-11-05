@@ -15,19 +15,16 @@ try:
 except ConnectionError:
     pass
 
-# print conn.request_get('teebird')[u'body']
-# print str( conn.request_put(resource='teebird', body='<div>gg:12</div>')['headers']['status'] )
 
-# print conn.request_post(resource='teebird', body=' ')['body']
 
-body = str(req_ttoc["new_pad"]) + '>newest_pad_in_town!'
+req = EncodingHandler.assamble_req('new_pad', 'newest_pad_in_town')
 
-print conn.request_put(resource='', body=body)['body']
+print conn.request_put(resource='', body=req)['body']
 
 exists_check = {'code': req_ttoc["pad_exists"], 'args': 'newest_pad_in_town'}
 
-print conn.request_get('', args=exists_check)['body']
+print conn.request_get(resource='', args=exists_check)['body']
 
 get_code = {'code': req_ttoc['last_mod']}
 
-print conn.request_get('newest_pad_in_town', args=get_code)['body']
+print conn.request_get(resource='newest_pad_in_town', args=get_code)['body']

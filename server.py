@@ -13,9 +13,11 @@ class Resource(object):
     def __init__(self, content):
         self.content = content
         self.last_mod = time_millis()
+        self.cr_n = -1
 
     exposed = True
 
+    """ Get details about pad """
     def GET(self, **params):
         cherrypy.log("SOMETHING")
 
@@ -28,16 +30,15 @@ class Resource(object):
 
             # Send appropriate error code
             else:
-                return resp_format %\
-                    {'code': resp_ttoc['bad_code'], 'args': str(req_code)}
+                return EncodingHandler.assamble_resp('bad_code', req_code)
         except KeyError:
-            return resp_format %\
-                {'code': resp_ttoc['bad_format'], 'args': str(req_code)}
+            return EncodingHandler.assamble_resp('bad_format')
 
         return str(params)
 
+    """ Content management operations """
     def POST(self):
-        req = Parser.parse_req(cherrypy.request.body.read())
+        req = EncodingHandler.parse_req(cherrypy.request.body.read())
         try:
             if req['code'] == req_ttoc['edit']:
                 encoded_edit = req['args']
@@ -46,12 +47,11 @@ class Resource(object):
 
             # Send appropriate error code
             else:
-                return resp_format %\
-                    {'code': resp_ttoc['bad_code'], 'args': str(req['code'])}
+                return EncodingHandler.assamble_resp('bad_code', req['code'])
         except KeyError:
-            return resp_format %\
-                {'code': resp_ttoc['bad_format'], 'args': str(req['code'])}
+            return EncodingHandler.assamble_resp('bad_format')
 
+    """ ? """
     def PUT(self):
         pass
 
@@ -60,6 +60,7 @@ class PadsManager(Resource):
     def __init__(self):
         super(Resource, self).__init__()
 
+    """ Get details about pads """
     def GET(self, **params):
         cherrypy.log("SOMETHING")
 
@@ -67,48 +68,42 @@ class PadsManager(Resource):
             req_code = int(params['code'])
             if req_code == req_ttoc['pad_exists']:
                 if hasattr(self, params['args']):
-                    return resp_format %\
-                        {'code': resp_ttoc['yes'], 'args': str(req_code)}
+                    return EncodingHandler.assamble_resp('yes', req_code)
                 else:
-                    return resp_format %\
-                        {'code': resp_ttoc['no'], 'args': str(req_code)}
+                    return EncodingHandler.assamble_resp('no', req_code)
 
             # Send appropriate error code
             else:
-                return resp_format %\
-                    {'code': resp_ttoc['bad_code'], 'args': str(req_code)}
+                return EncodingHandler.assamble_resp('bad_code', req_code)
         except KeyError:
-            return resp_format %\
-                {'code': resp_ttoc['bad_format'], 'args': str(req_code)}
+            return EncodingHandler.assamble_resp('bad_format')
 
         return str(params)
 
+    """ ? """
     def POST(self):
-        req = Parser.parse_req(cherrypy.request.body.read())
+        req = EncodingHandler.parse_req(cherrypy.request.body.read())
         pass
         return req['code']
 
+    """ Create and destroy pads """
     def PUT(self):
-        req = Parser.parse_req(cherrypy.request.body.read())
+        req = EncodingHandler.parse_req(cherrypy.request.body.read())
         try:
             if req['code'] == req_ttoc['new_pad']:
                 pad_uri = req['args']
                 try:
                     getattr(self, pad_uri)
-                    return resp_format %\
-                        {'code': resp_ttoc['pad_already_exists'], 'args': ''}
+                    return EncodingHandler.assamble_resp('pad_already_exists')
                 except AttributeError:
                     setattr(self, pad_uri, Resource('NEW!'))
-                    return resp_format %\
-                        {'code': resp_ttoc['ok'], 'args': str(req['code'])}
+                    return EncodingHandler.assamble_resp('ok', req['code'])
 
             # Send appropriate error code
             else:
-                return resp_format %\
-                    {'code': resp_ttoc['bad_code'], 'args': str(req['code'])}
+                return EncodingHandler.assamble_resp('bad_code', req['code'])
         except KeyError:
-            return resp_format %\
-                {'code': resp_ttoc['bad_format'], 'args': str(req_code)}
+            return EncodingHandler.assamble_resp('bad_format', req_code)
 
 
 root = PadsManager()

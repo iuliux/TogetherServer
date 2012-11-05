@@ -1,28 +1,28 @@
 import re
 
-resp_format = '%(code)d>%(args)s!'
+encode_format = '%(code)d>%(args)s!'
 
 # Request Type-to-Code
 req_ttoc = {
     # PadsManager
-        # GET  (10~19)
+        # GET  (10~19)  :: Get details about pads
         'pad_exists':   10,
 
-        # POST  (30~39)
+        # POST  (30~39)  ::
 
-        # PUT  (50~59)
+        # PUT  (50~59)  :: Create and destroy pads
         'new_pad':      50,
 
     # Resource(Pad)
-        # GET  (20~29)
+        # GET  (20~29)  :: Get details about pad
         'load':         20,
         'n_users':      21,
         'last_mod':     22,
 
-        # POST  (40~49)
+        # POST  (40~49)  :: Content management operations
         'edit':         40,
 
-        # PUT  (60~69)
+        # PUT  (60~69)  ::
 }
 
 # Response Type-to-Code
@@ -55,10 +55,10 @@ req_ctot = {key: value for (value, key) in req_ttoc.items()}
 resp_ctot = {key: value for (value, key) in resp_ttoc.items()}
 
 
-class Parser:
+class EncodingHandler:
     @staticmethod
     def parse_req(req):
-        pattern = re.compile(r'(?P<req_type>[0-9]*?)\>(?P<value>.*?)!')
+        pattern = re.compile(r'(?P<req_type>[0-9]+?)\>(?P<value>.*?)!')
         try:
             sections = re.search(pattern, req).groups()
         except TypeError:
@@ -70,15 +70,16 @@ class Parser:
         return req_dict
 
     @staticmethod
-    def parse_resp(resp):
-        print '>>>>>>>>', resp
-        pattern = re.compile(r'(?P<req_type>[0-9]*?)\>(?P<value>.*?)!')
-        try:
-            sections = re.search(pattern, resp).groups()
-        except TypeError:
-            return -1
-        ack = (int(sections[1]) == 1)
-        return (sections[0], ack)
+    def assamble_req(type_text, value=''):
+        return EncodingHandler._assamble_msg(req_ttoc[type_text], value)
+
+    @staticmethod
+    def assamble_resp(type_text, value=''):
+        return EncodingHandler._assamble_msg(resp_ttoc[type_text], value)
+
+    @staticmethod
+    def _assamble_msg(type_code, value):
+        return encode_format % {'code': type_code, 'args': str(value)}
 
     # @staticmethod
     # def encode_edit(type, )
