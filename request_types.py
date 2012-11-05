@@ -95,37 +95,48 @@ class EncodingHandler:
                 {'code': type_code, 'args': str(value)}
 
     @staticmethod
-    def encode_edit(op_type, position, delta, content=''):
-        """Encodes an edit command"""
+    def encode_edit(cr_n, op_type, pos, delta, content=''):
+        """Encodes an edit command. Arguments:
+            cr_n - (logic clock) number of this change-request
+            op_type - edit operation (+ / -)
+            pos - position of the edit
+            delta - number of modified characters
+            content - actual edit data (needed only for additions)
+        """
         op = '-'
         if op_type == ADD_EDIT:
             op = '+'
 
         # TODO: Encode numbers in a higher base (36)
-        return str(position) + op + str(delta) + ':' + content + ':'
+        return str(cr_n) + ':' + str(pos) + op + str(delta) + \
+                ':' + content + ':'
 
     @staticmethod
     def decode_edit(edit):
         """Decodes an encoded edit. Returns a dict:
+            cr_n - (logic clock) number of this change-request
             pos - position of the edit
             op - edit operation (+ / -)
             delta - number of modified characters
-            content - actual edit data
+            content - actual edit data (empty for deletions)
         """
-        pattern = re.compile(r'(?P<pos>[0-9]+?)(?P<op>[+-]?)(?P<delta>[0-9]+?):(?P<data>.*?):')
+        pattern = re.compile(
+            r'(?P<cr>[0-9]+?):(?P<pos>[0-9]+?)(?P<op>[+-]?)(?P<delta>[0-9]+?):(?P<data>.*?):'
+        )
         try:
             sections = re.search(pattern, edit).groups()
         except AttributeError:
             return None
 
         op = DEL_EDIT
-        if sections[1] == '+':
+        if sections[2] == '+':
             op = ADD_EDIT
 
         edit_dict = {
-            'pos': int(sections[0]),
+            'cr_n': int(sections[0]),
+            'pos': int(sections[1]),
             'op': op,
-            'delta': int(sections[2]),
-            'content': sections[3]
+            'delta': int(sections[3]),
+            'content': sections[4]
         }
         return edit_dict
