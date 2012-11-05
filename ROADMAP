@@ -1,0 +1,20 @@
+## ROADMAP:
+
+*	Get the configuration of the client-server system
+|
+*	Simulate collaboration protocol
+|
+O	Create a server prototype able to work with dummy clients
+:\
+: *		Implement buffer management
+: |
+: o		Implement buffer editting
+:
+:	Create a dummy client
+:
+:	Fully implement the system (with dummy clients, but complete functionality)
+:
+:	Create sublime-plugin client
+:
+:	Test and fix bugs
+:
