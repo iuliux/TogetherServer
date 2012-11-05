@@ -12,6 +12,7 @@ req_ttoc = {
 
         # PUT  (50~59)  :: Create and destroy pads
         'new_pad':      50,
+        'init_pad':     51,
 
     # Resource(Pad)
         # GET  (20~29)  :: Get details about pad
@@ -57,17 +58,17 @@ resp_ctot = {key: value for (value, key) in resp_ttoc.items()}
 
 class EncodingHandler:
     @staticmethod
-    def parse_req(req):
-        pattern = re.compile(r'(?P<req_type>[0-9]+?)\>(?P<value>.*?)!')
+    def parse_msg(msg):
+        pattern = re.compile(r'(?P<msg_type>[0-9]+?)\>(?P<value>.*?)!')
         try:
-            sections = re.search(pattern, req).groups()
-        except TypeError:
-            return -1
-        req_dict = {
+            sections = re.search(pattern, msg).groups()
+        except AttributeError:
+            return None
+        msg_dict = {
             'code': int(sections[0]),
             'args': sections[1]
         }
-        return req_dict
+        return msg_dict
 
     @staticmethod
     def assamble_req(type_text, value=''):

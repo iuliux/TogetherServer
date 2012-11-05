@@ -18,8 +18,11 @@ except ConnectionError:
 
 
 req = EncodingHandler.assamble_req('new_pad', 'newest_pad_in_town')
+encresp = conn.request_put(resource='', body=req)['body']
+resp = EncodingHandler.parse_msg(encresp)
 
-print conn.request_put(resource='', body=req)['body']
+if resp['code'] != resp_ttoc['pad_already_exists']:
+    pass
 
 exists_check = {'code': req_ttoc["pad_exists"], 'args': 'newest_pad_in_town'}
 

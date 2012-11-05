@@ -38,7 +38,7 @@ class Resource(object):
 
     """ Content management operations """
     def POST(self):
-        req = EncodingHandler.parse_req(cherrypy.request.body.read())
+        req = EncodingHandler.parse_msg(cherrypy.request.body.read())
         try:
             if req['code'] == req_ttoc['edit']:
                 encoded_edit = req['args']
@@ -82,13 +82,13 @@ class PadsManager(Resource):
 
     """ ? """
     def POST(self):
-        req = EncodingHandler.parse_req(cherrypy.request.body.read())
+        req = EncodingHandler.parse_msg(cherrypy.request.body.read())
         pass
         return req['code']
 
     """ Create and destroy pads """
     def PUT(self):
-        req = EncodingHandler.parse_req(cherrypy.request.body.read())
+        req = EncodingHandler.parse_msg(cherrypy.request.body.read())
         try:
             if req['code'] == req_ttoc['new_pad']:
                 pad_uri = req['args']
