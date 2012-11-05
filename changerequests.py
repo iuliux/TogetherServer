@@ -1,10 +1,11 @@
-"""Helper classes and constants for server"""
+"""Change-requests handling"""
 
 from request_types import *
 
 
 class ChangeRequest(object):
-    """Struct to wrap change requests"""
+    """Class to handle change requests"""
+
     def __init__(self, author, cr_n, pos, delta, op, value):
         super(ChangeRequest, self).__init__()
 
