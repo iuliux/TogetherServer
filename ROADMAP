@@ -6,9 +6,13 @@
 |
 O	Create a server prototype able to work with dummy clients
 :\
-: *		Implement buffer management
+: *	  Implement buffer management
 : |
-: o		Implement buffer editting
+: o	  Implement buffer editting
+: :\
+: : o   Find a good encoding for edits (compact)
+: : :
+: : :   Adapt implementation from simulation
 :
 :	Create a dummy client
 :
