@@ -10,50 +10,79 @@ def time_millis():
 
 
 class Resource(object):
-
-    def __init__(self, content):
-        self.content = content
-        self.last_mod = time_millis()
-        self.cr_n = -1
+    """Template class for a resource"""
+    def __init__(self):
+        super(Resource, self).__init__()
 
     exposed = True
 
-    """ Get details about pad """
     def GET(self, **params):
-        cherrypy.log("SOMETHING")
+        pass
 
-        try:
-            req_code = int(params['code'])
-            if req_code == req_ttoc['load']:
-                return self.content
-            elif req_code == req_ttoc['last_mod']:
-                return str(self.last_mod)
+    def HEAD(self, **params):
+        pass
 
-            # Send appropriate error code
-            else:
-                return EncodingHandler.assamble_resp('bad_code', req_code)
-        except KeyError:
-            return EncodingHandler.assamble_resp('bad_format')
+    def PUT(self, **params):
+        pass
 
+    def POST(self, **params):
+        pass
+
+    def DELETE(self, **params):
+        pass
+
+
+class Pad(Resource):
+
+    def __init__(self):
+        self.last_mod = time_millis()
+        # ChangeRequest (logic clock) number
+        self.cr_n = -1
+        # ChangeRequests list
+        self.crs = []
+
+        # Add it's personal Users resource
+        self.users = Users()
+
+    """Get all updates"""
+    def GET(self, **params):
+        # cherrypy.log("SOMETHING")
         return str(params)
 
-    """ Content management operations """
-    def POST(self):
-        req = EncodingHandler.parse_msg(cherrypy.request.body.read())
-        try:
-            if req['code'] == req_ttoc['edit']:
-                encoded_edit = req['args']
+    """Get timestamp of the latest modification"""
+    def HEAD(self, **params):
+        cherrypy.response.headers['data']=str(self.last_mod)
 
-                self.last_mod = time_millis()
+    """Edit"""
+    def PUT(self, **params):
+        encoded_edit = cherrypy.request.body.read()
+        cherrypy.log("EDIT: " + encoded_edit)
 
-            # Send appropriate error code
-            else:
-                return EncodingHandler.assamble_resp('bad_code', req['code'])
-        except KeyError:
-            return EncodingHandler.assamble_resp('bad_format')
+        self.last_mod = time_millis()
 
-    """ ? """
-    def PUT(self):
+        cherrypy.response.headers['code'] = resp_ttoc['ok']
+        return encoded_edit
+
+    """Discard user. Decrease reference count"""
+    def DELETE(self, **params):
+        pass
+
+
+class Users(Resource):
+
+    def __init__(self):
+        pass
+
+    """Get a list of all users"""
+    def GET(self, **params):
+        return "GET"
+
+    """Get the _total_ number of users"""
+    def HEAD(self, **params):
+        pass
+
+    """Change the name of the requester"""
+    def PUT(self, **params):
         pass
 
 
@@ -61,51 +90,31 @@ class PadsManager(Resource):
     def __init__(self):
         super(Resource, self).__init__()
 
-    """ Get details about pads """
+    """Check if pad exists"""
     def GET(self, **params):
-        cherrypy.log("SOMETHING")
+        if hasattr(self, params['data']):
+            cherrypy.response.headers['code'] = resp_ttoc['yes']
+        else:
+            cherrypy.response.headers['code'] = resp_ttoc['no']
 
+    """?"""
+    # def POST(self, **params):
+    #     req = EncodingHandler.parse_msg(cherrypy.request.body.read())
+    #     pass
+    #     return req['code']
+
+    """Create pad"""
+    def PUT(self, **params):
+        pad_uri = cherrypy.request.body.read()
         try:
-            req_code = int(params['code'])
-            if req_code == req_ttoc['pad_exists']:
-                if hasattr(self, params['args']):
-                    return EncodingHandler.assamble_resp('yes', req_code)
-                else:
-                    return EncodingHandler.assamble_resp('no', req_code)
-
+            getattr(self, pad_uri)
             # Send appropriate error code
-            else:
-                return EncodingHandler.assamble_resp('bad_code', req_code)
-        except KeyError:
-            return EncodingHandler.assamble_resp('bad_format')
-
-        return str(params)
-
-    """ ? """
-    def POST(self):
-        req = EncodingHandler.parse_msg(cherrypy.request.body.read())
-        pass
-        return req['code']
-
-    """ Create and destroy pads """
-    def PUT(self):
-        req = EncodingHandler.parse_msg(cherrypy.request.body.read())
-        try:
-            if req['code'] == req_ttoc['new_pad']:
-                pad_uri = req['args']
-                try:
-                    getattr(self, pad_uri)
-                    return EncodingHandler.assamble_resp('pad_already_exists')
-                except AttributeError:
-                    setattr(self, pad_uri, Resource('NEW!'))
-                    return EncodingHandler.assamble_resp('ok', req['code'])
-
-            # Send appropriate error code
-            else:
-                return EncodingHandler.assamble_resp('bad_code', req['code'])
-        except KeyError:
-            return EncodingHandler.assamble_resp('bad_format', req_code)
-
+            cherrypy.response.headers['code'] = resp_ttoc['pad_already_exists']
+            return
+        except AttributeError:
+            setattr(self, pad_uri, Pad())
+            cherrypy.response.headers['code'] = resp_ttoc['ok']
+            return
 
 root = PadsManager()
 

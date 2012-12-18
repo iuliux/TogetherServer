@@ -4,7 +4,7 @@ from request_types import *
 
 
 class ChangeRequest(object):
-    """Class to handle change requests"""
+    """Class to represent and handle change requests"""
 
     def __init__(self, author, cr_n, pos, delta, op, value):
         super(ChangeRequest, self).__init__()

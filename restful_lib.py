@@ -24,14 +24,8 @@ __version__ = '0.1'
 import httplib2
 import urlparse
 import urllib
-import base64
-from base64 import encodestring
 
 from mimeTypes import *
-
-import mimetypes
-
-from cStringIO import StringIO
 
 
 class ConnectionError(Exception):
@@ -69,47 +63,17 @@ class Connection:
     def request_head(self, resource, args=None, headers={}):
         return self.request(resource, "head", args, headers=headers)
 
-    def request_post(self, resource, args=None, body=None, filename=None, headers={}):
-        return self.request(resource, "post", args, body=body, filename=filename, headers=headers)
+    def request_post(self, resource, args=None, body=None, headers={}):
+        return self.request(resource, "post", args, body=body, headers=headers)
 
-    def request_put(self, resource, args=None, body=None, filename=None, headers={}):
-        return self.request(resource, "put", args, body=body, filename=filename, headers=headers)
+    def request_put(self, resource, args=None, body=None, headers={}):
+        return self.request(resource, "put", args, body=body, headers=headers)
 
-    def get_content_type(self, filename):
-        extension = filename.split('.')[-1]
-        guessed_mimetype = self.mimetypes.get(extension, mimetypes.guess_type(filename)[0])
-        return guessed_mimetype or 'application/octet-stream'
-
-    def request(self, resource, method="get", args=None, body=None, filename=None, headers={}):
-        params = None
+    def request(self, resource, method="get", args=None, body=None, headers={}):
         path = resource
         headers['User-Agent'] = 'Basic Agent'
 
-        BOUNDARY = u'00hoYUXOnLD5RQ8SKGYVgLLt64jejnMwtO7q8XE1'
-        CRLF = u'\r\n'
-
-        if filename and body:
-            #fn = open(filename ,'r')
-            #chunks = fn.read()
-            #fn.close()
-
-            # Attempt to find the Mimetype
-            content_type = self.get_content_type(filename)
-            headers['Content-Type'] = 'multipart/form-data; boundary=' + BOUNDARY
-            encode_string = StringIO()
-            encode_string.write(CRLF)
-            encode_string.write(u'--' + BOUNDARY + CRLF)
-            encode_string.write(u'Content-Disposition: form-data; name="file"; filename="%s"' % filename)
-            encode_string.write(CRLF)
-            encode_string.write(u'Content-Type: %s' % content_type + CRLF)
-            encode_string.write(CRLF)
-            encode_string.write(body)
-            encode_string.write(CRLF)
-            encode_string.write(u'--' + BOUNDARY + u'--' + CRLF)
-
-            body = encode_string.getvalue()
-            headers['Content-Length'] = str(len(body))
-        elif body:
+        if body:
             if not headers.get('Content-Type', None):
                 headers['Content-Type'] = 'text/xml'
             headers['Content-Length'] = str(len(body))

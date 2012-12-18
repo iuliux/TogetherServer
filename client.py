@@ -7,33 +7,39 @@
 # print str(content)
 
 from request_types import *
-
-from restful_lib import Connection, ConnectionError
+from communication import *
 
 try:
-    conn = Connection("http://localhost:8000")
+    con_starter = ConversationStarter("http://localhost:8000")
 except ConnectionError:
     pass
 
 pad = 'newest_pad_in_town'
 content = 'Hello, world!'
 
-req = EncodingHandler.assamble_req('new_pad', pad)
-encresp = conn.request_put(resource='', body=req)['body']
-resp = EncodingHandler.parse_msg(encresp)
+conv = con_starter.new(method='PUT', resource='')
+conv.send(pad)
+print conv.response_code
+print conv.response_data
 
 # if resp['code'] != resp_ttoc['pad_already_exists']:
 edit = EncodingHandler.encode_edit(ADD_EDIT, 0, len(content), content)
-req = EncodingHandler.assamble_req('edit', content)
 
-encresp = conn.request_post(resource=pad, body=req)['body']
-resp = EncodingHandler.parse_msg(encresp)
-print resp
+conv = con_starter.new(method='PUT', resource=pad)
+conv.send(edit)
+print conv.response_data
 # else:
     # print 'ALREADY EXISTS'
 
-exists_check = {'code': req_ttoc["pad_exists"], 'args': pad}
-print conn.request_get(resource='', args=exists_check)['body']
+print 'Pad exists?'
+conv = con_starter.new(method='GET', resource='')
+conv.send(pad)
+print conv.response_code
 
-get_code = {'code': req_ttoc['last_mod']}
-print conn.request_get(resource=pad, args=get_code)['body']
+conv = con_starter.new(method='HEAD', resource=pad)
+conv.send(pad)
+print 'TIMESTAMP:', conv.response_data
+
+conv = con_starter.new(method='HEAD', resource=pad+'/users')
+conv.send(pad)
+print 'NO. USERS:', conv.response_data

@@ -25,10 +25,8 @@ req_ttoc = {
 
 # Response Type-to-Code
 resp_ttoc = {
-    'hello':        100,  #
-    'ok':           101,  #
-    'bad_code':     108,  #
-    'bad_format':   109,  #
+    'ok':               101,  # Generic success message
+    'generic_error':    108,  # Generic fail message
 
     # PadsManager
         # GET  (110~119)
@@ -38,7 +36,7 @@ resp_ttoc = {
         # POST  (130~139)
 
         # PUT  (150~159)
-        'pad_already_exists':   150,  #
+        'pad_already_exists':   '150',  # Error message
 
     # Resource(Pad)
         # GET  (120~129)
@@ -48,9 +46,10 @@ resp_ttoc = {
         # PUT  (160~169)
 }
 
-# For reverse looking up
-req_ctot = {key: value for (value, key) in req_ttoc.items()}
+# For reverse look-up
 resp_ctot = {key: value for (value, key) in resp_ttoc.items()}
+
+req_ctot = {key: value for (value, key) in req_ttoc.items()}
 
 
 # Edit types
@@ -60,6 +59,10 @@ DEL_EDIT = 1
 
 class EncodingHandler:
     _encode_format = '%(code)d>%(args)s!'
+
+    @staticmethod
+    def resp_code(resp):
+        pass
 
     @staticmethod
     def parse_msg(msg):

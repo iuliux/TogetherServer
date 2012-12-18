@@ -54,7 +54,6 @@ class Server(object):
 
         [cr.author.apply(confl) for confl in conflicts]
 
-        # TODO:
         # Modifica CR-ul incat sa aiba noua pozitie (dupa eventuale modificari)
 
         # Update starting position for the new CR
