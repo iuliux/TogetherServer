@@ -6,7 +6,6 @@
 # # print str(response)
 # print str(content)
 
-from request_types import *
 from communication import *
 
 try:
@@ -23,7 +22,7 @@ print conv.response_code
 print conv.response_data
 
 # if resp['code'] != resp_ttoc['pad_already_exists']:
-edit = EncodingHandler.encode_edit(ADD_EDIT, 0, len(content), content)
+edit = EncodingHandler.encode_edit(EncodingHandler.ADD_EDIT, 0, len(content), content)
 
 conv = con_starter.new(method='PUT', resource=pad)
 conv.send(edit)

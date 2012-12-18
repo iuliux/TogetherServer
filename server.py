@@ -2,7 +2,7 @@ import cherrypy
 import time
 
 from server_helpers import *
-from request_types import *
+from communication import *
 
 
 def time_millis():
@@ -13,6 +13,15 @@ class Resource(object):
     """Template class for a resource"""
     def __init__(self):
         super(Resource, self).__init__()
+
+    def set_response_code(self, rsp_type='generic_error'):
+        cherrypy.response.headers['code'] = EncodingHandler.resp_ttoc[rsp_type]
+
+    def set_response_header(self, hdr, data):
+        cherrypy.response.headers[hdr] = data
+
+    def get_request_body(self):
+        return cherrypy.request.body.read()
 
     exposed = True
 
@@ -51,16 +60,16 @@ class Pad(Resource):
 
     """Get timestamp of the latest modification"""
     def HEAD(self, **params):
-        cherrypy.response.headers['data']=str(self.last_mod)
+        self.set_response_header('data', str(self.last_mod))
 
     """Edit"""
     def PUT(self, **params):
-        encoded_edit = cherrypy.request.body.read()
+        encoded_edit = self.get_request_body()
         cherrypy.log("EDIT: " + encoded_edit)
 
         self.last_mod = time_millis()
 
-        cherrypy.response.headers['code'] = resp_ttoc['ok']
+        self.set_response_code('ok')
         return encoded_edit
 
     """Discard user. Decrease reference count"""
@@ -93,27 +102,27 @@ class PadsManager(Resource):
     """Check if pad exists"""
     def GET(self, **params):
         if hasattr(self, params['data']):
-            cherrypy.response.headers['code'] = resp_ttoc['yes']
+            self.set_response_code('yes')
         else:
-            cherrypy.response.headers['code'] = resp_ttoc['no']
+            self.set_response_code('no')
 
     """?"""
     # def POST(self, **params):
-    #     req = EncodingHandler.parse_msg(cherrypy.request.body.read())
+    #     req = EncodingHandler.parse_msg(self.get_request_body())
     #     pass
     #     return req['code']
 
     """Create pad"""
     def PUT(self, **params):
-        pad_uri = cherrypy.request.body.read()
+        pad_uri = self.get_request_body()
         try:
             getattr(self, pad_uri)
             # Send appropriate error code
-            cherrypy.response.headers['code'] = resp_ttoc['pad_already_exists']
+            self.set_response_code('pad_already_exists')
             return
         except AttributeError:
             setattr(self, pad_uri, Pad())
-            cherrypy.response.headers['code'] = resp_ttoc['ok']
+            self.set_response_code('ok')
             return
 
 root = PadsManager()
