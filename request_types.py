@@ -1,28 +1,5 @@
 import re
 
-# Request Type-to-Code
-req_ttoc = {
-    # PadsManager
-        # GET  (10~19)  :: Get details about pads
-        'pad_exists':   10,  # Check if pad exists
-
-        # POST  (30~39)  ::
-
-        # PUT  (50~59)  :: Create and destroy pads
-        'new_pad':      50,  # Instantiate a new pad
-
-    # Resource(Pad)
-        # GET  (20~29)  :: Get details about pad
-        'load':         20,  # Get the whole content and CR-number of pad
-        'n_users':      21,  # Get the number of current users
-        'last_mod':     22,  # Timestamp of the latest edit
-
-        # POST  (40~49)  :: Content management operations
-        'edit':         40,  # Commit an edit
-
-        # PUT  (60~69)  ::
-}
-
 # Response Type-to-Code
 resp_ttoc = {
     'ok':               101,  # Generic success message
@@ -30,8 +7,8 @@ resp_ttoc = {
 
     # PadsManager
         # GET  (110~119)
-        'yes':                  110,  #
-        'no':                   111,  #
+        'yes':                  110,  # Positive answer
+        'no':                   111,  # Negative answer (not error)
 
         # POST  (130~139)
 
@@ -49,8 +26,6 @@ resp_ttoc = {
 # For reverse look-up
 resp_ctot = {key: value for (value, key) in resp_ttoc.items()}
 
-req_ctot = {key: value for (value, key) in req_ttoc.items()}
-
 
 # Edit types
 ADD_EDIT = 0
@@ -58,44 +33,6 @@ DEL_EDIT = 1
 
 
 class EncodingHandler:
-    _encode_format = '%(code)d>%(args)s!'
-
-    @staticmethod
-    def resp_code(resp):
-        pass
-
-    @staticmethod
-    def parse_msg(msg):
-        """Parses an assambled message, either request or response.
-            Returns a dict:
-                code - request or response type code
-                args - dependent on message type
-        """
-        pattern = re.compile(r'(?P<msg_type>[0-9]+?)\>(?P<value>.*?)!')
-        try:
-            sections = re.search(pattern, msg).groups()
-        except AttributeError:
-            return None
-        msg_dict = {
-            'code': int(sections[0]),
-            'args': sections[1]
-        }
-        return msg_dict
-
-    @staticmethod
-    def assamble_req(type_text, value=''):
-        """Encodes a request to be sent over the network"""
-        return EncodingHandler._assamble_msg(req_ttoc[type_text], value)
-
-    @staticmethod
-    def assamble_resp(type_text, value=''):
-        """Encodes a response to be sent over the network"""
-        return EncodingHandler._assamble_msg(resp_ttoc[type_text], value)
-
-    @staticmethod
-    def _assamble_msg(type_code, value):
-        return EncodingHandler._encode_format % \
-                {'code': type_code, 'args': str(value)}
 
     @staticmethod
     def encode_edit(cr_n, op_type, pos, delta, content=''):
