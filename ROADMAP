@@ -10,9 +10,9 @@ O	3. Create a server prototype able to work with dummy clients
 : |
 : o	  3.2. Implement buffer editting
 : :\
-: : o   3.2.1. Find a good encoding for edits (compact)
-: : :
-: : :   3.2.2. Adapt implementation from simulation
+: : x   3.2.1. Find a good encoding for edits (compact)
+: : |
+: : o   3.2.2. Adapt implementation from simulation
 :
 :	4. Create a dummy client
 :
