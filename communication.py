@@ -93,34 +93,28 @@ class EncodingHandler:
             # POST  (130~139)
 
             # PUT  (150~159)
-            'pad_already_exists':   '150',  # Error message
+            'pad_already_exists':   150,  # Error message
 
-        # Resource(Pad)
+        # Pad
             # GET  (120~129)
 
             # POST  (140~149)
 
             # PUT  (160~169)
+            'update_needed':        160,  # Additional updates are in msg-body
     }
     # For reverse look-up
     resp_ctot = {key: value for (value, key) in resp_ttoc.items()}
 
     @staticmethod
-    def encode_edit(cr_n, op_type, pos, delta, content=''):
-        """Encodes an edit command. Arguments:
-            cr_n - (logic clock) number of this change-request
-            op_type - edit operation (+ / -)
-            pos - position of the edit
-            delta - number of modified characters
-            content - actual edit data (needed only for additions)
-        """
-        op = '-'
-        if op_type == EncodingHandler.ADD_EDIT:
-            op = '+'
+    def serialize_list(l):
+        """Serializes a list into a string"""
+        return '>'.join(l)
 
-        # TODO: Encode numbers in a higher base (36)
-        return str(cr_n) + ':' + str(pos) + op + str(delta) + \
-                ':' + content + ':'
+    @staticmethod
+    def deserialize_list(sl):
+        """Deserializes a serialized list"""
+        return sl.split('>')
 
     @staticmethod
     def decode_edit(edit):
@@ -143,11 +137,10 @@ class EncodingHandler:
         if sections[2] == '+':
             op = EncodingHandler.ADD_EDIT
 
-        edit_dict = {
-            'cr_n': int(sections[0]),
-            'pos': int(sections[1]),
-            'op': op,
-            'delta': int(sections[3]),
-            'content': sections[4]
-        }
-        return edit_dict
+        return ChangeRequest(author='NoOne',
+                            cr_n=int(sections[0]),
+                            pos=int(sections[1]),
+                            delta=int(sections[3]),
+                            op=op,
+                            value=sections[4]
+                            )

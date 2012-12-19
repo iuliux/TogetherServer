@@ -12,6 +12,20 @@ class ChangeRequest(object):
         self.author, self.num, self.pos, self.delta, self.op, self.value =\
             author, cr_n, pos, delta, op, value
 
+    def serialize():
+        """Produces a string that encodes the CR"""
+        parts = {}
+        parts['op'] = '-'
+        if self.op == EncodingHandler.ADD_EDIT:
+            parts['op'] = '+'
+        # TODO: Encode numbers in a higher base (36)
+        parts['cr_n'] = str(self.cr_n)
+        parts['pos'] = str(self.pos)
+        parts['delta'] = str(self.delta)
+        parts['content'] = self.content
+
+        return "%(cr_n)s:%(pos)s%(op)s%(delta)s:%(content)s:" % parts
+
     def __str__(self):
         return self.__repr__()
 

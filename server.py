@@ -1,7 +1,6 @@
 import cherrypy
 import time
 
-from server_helpers import *
 from communication import *
 
 
@@ -55,7 +54,6 @@ class Pad(Resource):
 
     """Get all updates"""
     def GET(self, **params):
-        # cherrypy.log("SOMETHING")
         return str(params)
 
     """Get timestamp of the latest modification"""
@@ -66,11 +64,31 @@ class Pad(Resource):
     def PUT(self, **params):
         encoded_edit = self.get_request_body()
         cherrypy.log("EDIT: " + encoded_edit)
+        cr = EncodingHandler.decode_edit(encoded_edit)
 
         self.last_mod = time_millis()
+        self.cr_n += 1
+
+        # Collect all CRs applied after the last update of author
+        conflicts = self.crs[cr.cr_n+1:self.cr_n]
+
+        if conflicts:
+            # Update starting position for the new CR
+            pos_delta = 0
+            for confl in conflicts:
+                if confl.pos < cr.pos:
+                    pos_delta += confl.delta
+            cr.pos += pos_delta
+
+            # The list of CRs the client needs to apply to get up to date
+            sendback = conflicts + [cr]
+            enc_sendback = [i_cr.serialize() for i_cr in sendback]
+            ser_sendback = EncodingHandler.serialize_list(enc_sendback)
+
+            self.set_response_code('ok')
+            return ser_sendback
 
         self.set_response_code('ok')
-        return encoded_edit
 
     """Discard user. Decrease reference count"""
     def DELETE(self, **params):

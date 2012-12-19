@@ -44,7 +44,6 @@ class Server(object):
     def commit(self, cr):
         self.cr_n += 1
 
-        # TODO:
         # Daca vine un commit intarziat (s-au intamplat alte commituri de la
         # ultimul update al autorului prezent), autorul prezent trebuie obligat
         # sa aplice modificarile alea inainte sa o faca pe a lui.
