@@ -77,9 +77,6 @@ class UndefinedMethodError(Exception):
 
 
 class EncodingHandler:
-    # Edit types
-    ADD_EDIT = 0
-    DEL_EDIT = 1
 
     # Response Type-to-Code
     resp_ttoc = {
@@ -116,32 +113,3 @@ class EncodingHandler:
     def deserialize_list(sl):
         """Deserializes a serialized list"""
         return sl.split('>')
-
-    @staticmethod
-    def decode_edit(edit):
-        """Decodes an encoded edit. Returns a dict:
-            cr_n - (logic clock) number of this change-request
-            pos - position of the edit
-            op - edit operation (+ / -)
-            delta - number of modified characters
-            content - actual edit data (empty for deletions)
-        """
-        pattern = re.compile(
-            r'(?P<auth>.+?):(?P<cr>-?[0-9]+?):(?P<pos>[0-9]+?)(?P<op>[+-]?)(?P<delta>[0-9]+?):(?P<data>.*?):'
-        )
-        try:
-            sections = re.search(pattern, edit).groups()
-        except AttributeError:
-            return None
-
-        op = EncodingHandler.DEL_EDIT
-        if sections[3] == '+':
-            op = EncodingHandler.ADD_EDIT
-
-        return ChangeRequest(author=sections[0],
-                            cr_n=int(sections[1]),
-                            pos=int(sections[2]),
-                            delta=int(sections[4]),
-                            op=op,
-                            value=sections[5]
-                            )

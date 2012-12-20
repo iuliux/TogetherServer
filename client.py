@@ -27,7 +27,7 @@ edit = ChangeRequest(author='B',
                     cr_n=-1,
                     pos=0,
                     delta=len(content),
-                    op=EncodingHandler.ADD_EDIT,
+                    op=ChangeRequest.ADD_EDIT,
                     value=content)
 
 conv = con_starter.new(method='PUT', resource=pad)
@@ -42,7 +42,7 @@ edit = ChangeRequest(author='A',
                     cr_n=-1,
                     pos=0,
                     delta=len('Abba'),
-                    op=EncodingHandler.ADD_EDIT,
+                    op=ChangeRequest.ADD_EDIT,
                     value='Abba')
 
 conv = con_starter.new(method='PUT', resource=pad)
@@ -58,7 +58,7 @@ edit = ChangeRequest(author='A',
                     cr_n=new_cr_n,
                     pos=0,
                     delta=1,
-                    op=EncodingHandler.DEL_EDIT,
+                    op=ChangeRequest.DEL_EDIT,
                     value='')
 
 conv = con_starter.new(method='PUT', resource=pad)

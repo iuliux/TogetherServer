@@ -63,7 +63,8 @@ class Pad(Resource):
     """Edit"""
     def PUT(self, **params):
         encoded_edit = self.get_request_body()
-        cr = EncodingHandler.decode_edit(encoded_edit)
+        cr = ChangeRequest()
+        cr.deserialize(encoded_edit)
         cherrypy.log("- EncCR: " + str(encoded_edit))
         cherrypy.log("- CurrCR: " + str(cr))
 
@@ -134,9 +135,7 @@ class PadsManager(Resource):
 
     """?"""
     # def POST(self, **params):
-    #     req = EncodingHandler.parse_msg(self.get_request_body())
     #     pass
-    #     return req['code']
 
     """Create pad"""
     def PUT(self, **params):
