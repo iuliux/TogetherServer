@@ -33,6 +33,7 @@ class Conversation:
         Sends the request and receives the response
         After this method finishes, response data will be available
         """
+        data = str(data)
         if self._method == 'GET':
             resp = self._conn.request_get(resource=self._resource,
                                             args={'data': data},
@@ -95,6 +96,7 @@ class EncodingHandler:
 
         # Pad
             # GET  (120~129)
+            "nan":                  120,  # Not a number
 
             # POST  (140~149)
 

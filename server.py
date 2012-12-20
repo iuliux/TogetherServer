@@ -54,7 +54,25 @@ class Pad(Resource):
 
     """Get all updates"""
     def GET(self, **params):
-        return str(params)
+        try:
+            client_cr_n = int(params['data'])
+        except ValueError:
+            self.set_response_code('nan')
+            return
+
+        if client_cr_n < self.cr_n:
+            sendback = self.crs[client_cr_n+1:self.cr_n+1]
+            enc_sendback = [i_cr.serialize() for i_cr in sendback]
+            ser_sendback = EncodingHandler.serialize_list(enc_sendback)
+
+            # Update client's CR number
+            self.set_response_header('new_cr_n', str(self.cr_n))
+            self.set_response_code('update_needed')
+        else:
+            ser_sendback = ''
+            self.set_response_code('ok')
+
+        return ser_sendback
 
     """Get timestamp of the latest modification"""
     def HEAD(self, **params):
@@ -87,6 +105,7 @@ class Pad(Resource):
             enc_sendback = [i_cr.serialize() for i_cr in sendback]
             ser_sendback = EncodingHandler.serialize_list(enc_sendback)
 
+            # Update client's CR number
             self.set_response_header('new_cr_n', str(self.cr_n))
             self.set_response_code('update_needed')
         else:

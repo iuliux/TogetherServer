@@ -2,8 +2,6 @@
 
 import re
 
-from request_types import *
-
 
 class ChangeRequest(object):
     """
@@ -58,6 +56,18 @@ class ChangeRequest(object):
         self.delta = int(sections[4])
         self.op = op
         self.value = sections[5]
+
+    def apply_over(self, instr):
+        if self.op == ChangeRequest.ADD_EDIT:
+            head = instr[:self.pos]
+            tail = instr[self.pos:]
+            return head + self.value + tail
+        elif self.op == ChangeRequest.DEL_EDIT:
+            head = instr[:self.pos]
+            tail = instr[self.pos+self.delta:]
+            return head + tail
+        else:
+            print 'UNKNOWN OPERATION'
 
     def __str__(self):
         return self.__repr__()
