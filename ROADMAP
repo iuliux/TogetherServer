@@ -4,17 +4,19 @@
 |
 *	2. Simulate collaboration protocol
 |
-O	3. Create a server prototype able to work with dummy clients
-:\
-: *	  3.1. Implement buffer management
-: |
-: o	  3.2. Implement buffer editting
-: :\
-: : x   3.2.1. Find a good encoding for edits (compact)
-: : |
-: : o   3.2.2. Adapt implementation from simulation
-:
-:	4. Create a dummy client
+o	3. Create a server prototype able to work with dummy clients
+|\
+| *	  3.1. Implement buffer management
+| |
+| *	  3.2. Implement buffer editting
+| |\
+| | *   3.2.1. Find a good encoding for edits (compact)
+| | |
+| | *   3.2.2. Adapt implementation from simulation
+| |
+| o	  3.3. Implement client managing
+|
+O	4. Create a dummy client
 :
 :	5. Fully implement the system (with dummy clients, but complete functionality)
 :
