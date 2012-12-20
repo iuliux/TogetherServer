@@ -1,5 +1,6 @@
 import re
 from restful_lib import Connection
+from changerequests import *
 
 
 class ConversationStarter:
@@ -126,7 +127,7 @@ class EncodingHandler:
             content - actual edit data (empty for deletions)
         """
         pattern = re.compile(
-            r'(?P<cr>[0-9]+?):(?P<pos>[0-9]+?)(?P<op>[+-]?)(?P<delta>[0-9]+?):(?P<data>.*?):'
+            r'(?P<auth>.+?):(?P<cr>-?[0-9]+?):(?P<pos>[0-9]+?)(?P<op>[+-]?)(?P<delta>[0-9]+?):(?P<data>.*?):'
         )
         try:
             sections = re.search(pattern, edit).groups()
@@ -134,13 +135,13 @@ class EncodingHandler:
             return None
 
         op = EncodingHandler.DEL_EDIT
-        if sections[2] == '+':
+        if sections[3] == '+':
             op = EncodingHandler.ADD_EDIT
 
-        return ChangeRequest(author='NoOne',
-                            cr_n=int(sections[0]),
-                            pos=int(sections[1]),
-                            delta=int(sections[3]),
+        return ChangeRequest(author=sections[0],
+                            cr_n=int(sections[1]),
+                            pos=int(sections[2]),
+                            delta=int(sections[4]),
                             op=op,
-                            value=sections[4]
+                            value=sections[5]
                             )

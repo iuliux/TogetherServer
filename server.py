@@ -63,8 +63,9 @@ class Pad(Resource):
     """Edit"""
     def PUT(self, **params):
         encoded_edit = self.get_request_body()
-        cherrypy.log("EDIT: " + encoded_edit)
         cr = EncodingHandler.decode_edit(encoded_edit)
+        cherrypy.log("- EncCR: " + str(encoded_edit))
+        cherrypy.log("- CurrCR: " + str(cr))
 
         self.last_mod = time_millis()
         self.cr_n += 1
@@ -85,10 +86,17 @@ class Pad(Resource):
             enc_sendback = [i_cr.serialize() for i_cr in sendback]
             ser_sendback = EncodingHandler.serialize_list(enc_sendback)
 
+            self.set_response_header('new_cr_n', str(self.cr_n))
+            self.set_response_code('update_needed')
+        else:
+            ser_sendback = ''
             self.set_response_code('ok')
-            return ser_sendback
 
-        self.set_response_code('ok')
+        # Add current CR to archive
+        self.crs.append(cr)
+        cherrypy.log("------ CRs: " + str(self.crs))
+
+        return ser_sendback
 
     """Discard user. Decrease reference count"""
     def DELETE(self, **params):
