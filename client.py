@@ -22,6 +22,9 @@ conv.send(pad)
 print conv.response_code
 print conv.response_data
 
+
+
+
 # if resp['code'] != resp_ttoc['pad_already_exists']:
 edit = ChangeRequest(author='B',
                     cr_n=-1,
@@ -35,8 +38,14 @@ conv.send(edit.serialize())
 print 'B commits "Hello, world!"'
 print 'Code: ', conv.response_code
 print 'Data: ', conv.response_data
+if conv.response_code == 160:
+    new_cr_n = conv.response_headers['new_cr_n']
+    print 'New CR_n: ', new_cr_n
+print
 # else:
     # print 'ALREADY EXISTS'
+
+
 
 edit = ChangeRequest(author='A',
                     cr_n=-1,
@@ -53,6 +62,9 @@ print 'Data: ', conv.response_data
 if conv.response_code == 160:
     new_cr_n = conv.response_headers['new_cr_n']
     print 'New CR_n: ', new_cr_n
+print
+
+
 
 edit = ChangeRequest(author='A',
                     cr_n=new_cr_n,
@@ -69,6 +81,28 @@ print 'Data: ', conv.response_data
 if conv.response_code == 160:
     new_cr_n = conv.response_headers['new_cr_n']
     print 'New CR_n: ', new_cr_n
+print
+
+
+
+edit = ChangeRequest(author='B',
+                    cr_n=0,
+                    pos=0,
+                    delta=len(content),
+                    op=ChangeRequest.ADD_EDIT,
+                    value=content)
+
+conv = con_starter.new(method='PUT', resource=pad)
+conv.send(edit.serialize())
+print 'B commits "Hello, world!" again'
+print 'Code: ', conv.response_code
+print 'Data: ', conv.response_data
+if conv.response_code == 160:
+    new_cr_n = conv.response_headers['new_cr_n']
+    print 'New CR_n: ', new_cr_n
+print
+
+
 
 
 print 'Pad exists?'

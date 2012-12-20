@@ -31,7 +31,7 @@ class ChangeRequest(object):
         """Produces a string that encodes the CR"""
         parts = {}
         parts['op'] = '-'
-        if self.op == ADD_EDIT:
+        if self.op == ChangeRequest.ADD_EDIT:
             parts['op'] = '+'
         # TODO: Encode numbers in a higher base (36)
         parts['auth'] = self.author
@@ -48,9 +48,9 @@ class ChangeRequest(object):
         )
         sections = re.search(pattern, edit).groups()
 
-        op = DEL_EDIT
+        op = ChangeRequest.DEL_EDIT
         if sections[3] == '+':
-            op = ADD_EDIT
+            op = ChangeRequest.ADD_EDIT
 
         self.author = sections[0]
         self.cr_n = int(sections[1])
@@ -64,9 +64,9 @@ class ChangeRequest(object):
 
     def __repr__(self):
         oper = 'n/a'
-        if self.op == ADD_EDIT:
+        if self.op == ChangeRequest.ADD_EDIT:
             oper = 'ins'
-        elif self.op == DEL_EDIT:
+        elif self.op == ChangeRequest.DEL_EDIT:
             oper = 'del'
 
         if self.delta > 0:
