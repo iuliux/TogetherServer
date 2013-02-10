@@ -25,8 +25,6 @@ import httplib2
 import urlparse
 import urllib
 
-from mimeTypes import *
-
 
 class ConnectionError(Exception):
     def __str__(self):
@@ -37,8 +35,6 @@ class Connection:
     def __init__(self, base_url, username=None, password=None):
         self.base_url = base_url
         self.username = username
-        m = mimeTypes()
-        self.mimetypes = m.getDictionary()
 
         self.url = urlparse.urlparse(base_url)
 
