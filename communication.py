@@ -1,4 +1,3 @@
-import re
 from restful_lib import Connection
 from changerequests import *
 
@@ -53,7 +52,8 @@ class Conversation:
             resp = self._conn.request_put(resource=self._resource,
                                             body=data,
                                             headers=headers)
-        # else raise UndefinedMethodError
+        else:
+            raise UndefinedMethodError()
 
         # Set response data
         self.response_headers = resp['headers']
@@ -104,7 +104,10 @@ class EncodingHandler:
             'update_needed':        160,  # Additional updates are in msg-body
     }
     # For reverse look-up
-    resp_ctot = {key: value for (value, key) in resp_ttoc.items()}
+    # resp_ctot = {key: value for (value, key) in resp_ttoc.items()}
+    resp_ctot = {}
+    for tp in resp_ttoc:
+        resp_ctot[resp_ttoc[tp]] = tp
 
     @staticmethod
     def serialize_list(l):

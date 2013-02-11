@@ -10,14 +10,14 @@ from communication import *
 from changerequests import *
 
 try:
-    con_starter = ConversationStarter("http://localhost:8000")
+    conv_starter = ConversationStarter("http://localhost:8000")
 except ConnectionError:
     pass
 
 pad = 'newest_pad_in_town'
 content = 'Hello, world!'
 
-conv = con_starter.new(method='PUT', resource='')
+conv = conv_starter.new(method='PUT', resource='')
 conv.send(pad)
 print conv.response_code
 print conv.response_data
@@ -37,7 +37,7 @@ edit = ChangeRequest(author='B',
 B_cr_n += 1
 
 print 'Old B ::::::::::', B
-conv = con_starter.new(method='PUT', resource=pad)
+conv = conv_starter.new(method='PUT', resource=pad)
 conv.send(edit.serialize())
 print 'B commits "Hello, world!"'
 print 'Code: ', conv.response_code
@@ -69,7 +69,7 @@ edit = ChangeRequest(author='A',
 A_cr_n += 1
 
 print 'Old A ::::::::::', A
-conv = con_starter.new(method='PUT', resource=pad)
+conv = conv_starter.new(method='PUT', resource=pad)
 conv.send(edit.serialize())
 print 'A commits "Abba"'
 print 'Code: ', conv.response_code
@@ -98,7 +98,7 @@ edit = ChangeRequest(author='A',
 A_cr_n += 1
 
 print 'Old A ::::::::::', A
-conv = con_starter.new(method='PUT', resource=pad)
+conv = conv_starter.new(method='PUT', resource=pad)
 conv.send(edit.serialize())
 print 'A commits "0-1"'
 print 'Code: ', conv.response_code
@@ -127,7 +127,7 @@ edit = ChangeRequest(author='B',
 B_cr_n += 1
 
 print 'Old B ::::::::::', B
-conv = con_starter.new(method='PUT', resource=pad)
+conv = conv_starter.new(method='PUT', resource=pad)
 conv.send(edit.serialize())
 print 'B commits "Hello, world!" again'
 print 'Code: ', conv.response_code
@@ -149,7 +149,7 @@ print
 
 
 print 'Old A ::::::::::', A
-conv = con_starter.new(method='GET', resource=pad)
+conv = conv_starter.new(method='GET', resource=pad)
 conv.send(A_cr_n)
 A_cr_n += 1
 print 'A updates'
@@ -170,14 +170,14 @@ print
 
 
 print 'Pad exists?'
-conv = con_starter.new(method='GET', resource='')
+conv = conv_starter.new(method='GET', resource='')
 conv.send(pad)
 print conv.response_code
 
-conv = con_starter.new(method='HEAD', resource=pad)
+conv = conv_starter.new(method='HEAD', resource=pad)
 conv.send(pad)
 print 'TIMESTAMP:', conv.response_data
 
-conv = con_starter.new(method='HEAD', resource=pad+'/users')
+conv = conv_starter.new(method='HEAD', resource=pad+'/users')
 conv.send(pad)
 print 'NO. USERS:', conv.response_data
