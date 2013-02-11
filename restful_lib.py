@@ -1,4 +1,7 @@
 """
+    Heavily modified and limited to use httplib instead of httplib2
+
+
     Copyright (C) 2008 Benjamin O'Steen
 
     This file is part of python-fedoracommons.
@@ -21,7 +24,7 @@ __license__ = 'GPL http://www.gnu.org/licenses/gpl.txt'
 __author__ = "Benjamin O'Steen <bosteen@gmail.com>"
 __version__ = '0.1'
 
-import httplib2
+import httplib
 import urlparse
 import urllib
 
@@ -32,23 +35,19 @@ class ConnectionError(Exception):
 
 
 class Connection:
-    def __init__(self, base_url, username=None, password=None):
+    def __init__(self, base_url):
         self.base_url = base_url
-        self.username = username
 
         self.url = urlparse.urlparse(base_url)
 
-        (scheme, netloc, path, query, fragment) = urlparse.urlsplit(base_url)
+        scheme, netloc, path, _, _ = urlparse.urlsplit(base_url)
 
         self.scheme = scheme
         self.host = netloc
         self.path = path
 
-        # Create Http class with support for Digest HTTP Authentication, if necessary
-        self.h = httplib2.Http(".cache")
+        self.h = httplib.HTTPConnection(netloc)
         self.h.follow_all_redirects = True
-        if username and password:
-            self.h.add_credentials(username, password)
 
     def request_get(self, resource, args=None, headers={}):
         return self.request(resource, "get", args, headers=headers)
@@ -98,6 +97,9 @@ class Connection:
             else:
                 request_path.append(path)
 
-        resp, content = self.h.request(u"%s://%s%s" % (self.scheme, self.host, u'/'.join(request_path)), method.upper(), body=body, headers=headers)
-        # TODO trust the return encoding type in the decode?
-        return {u'headers': resp, u'body': content.decode('UTF-8')}
+        self.h.request(method.upper(), u'/'.join(request_path), body=body, headers=headers)
+        resp = self.h.getresponse()
+        headers = {}
+        for hdr in resp.getheaders():
+            headers[hdr[0]] = hdr[1]
+        return {'headers': headers, 'body': resp.read().decode('UTF-8')}
