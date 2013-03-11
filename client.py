@@ -11,7 +11,7 @@ from changerequests import *
 
 try:
     conv_starter = ConversationStarter("http://localhost:8000")
-except ConnectionError:
+except Exception:
     pass
 
 pad = 'newest_pad_in_town'
@@ -172,6 +172,11 @@ print
 print 'Pad exists?'
 conv = conv_starter.new(method='GET', resource='')
 conv.send(pad)
+print conv.response_code
+
+print 'Unexisting Pad exists?'
+conv = conv_starter.new(method='GET', resource='')
+conv.send('non_pad')
 print conv.response_code
 
 conv = conv_starter.new(method='HEAD', resource=pad)
