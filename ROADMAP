@@ -14,13 +14,13 @@ o	3. Create a server prototype able to work with dummy clients
 | | |
 | | *   3.2.2. Adapt implementation from simulation
 | |
-| o	  3.3. Implement client managing
+| o	  3.3. Implement users managing
 |
-O	4. Create a dummy client
+*	4. Create dummy clients
+|
+O	5. Create sublime-plugin client
 :
-:	5. Fully implement the system (with dummy clients, but complete functionality)
-:
-:	6. Create sublime-plugin client
+:	6. Fully implement the system (with dummy clients, but complete server)
 :
 :	7. Test and fix bugs
 :
