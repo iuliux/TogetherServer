@@ -68,6 +68,7 @@ class ChangeRequest(object):
             return head + tail
         else:
             print 'UNKNOWN OPERATION'
+            return instr
 
     def __str__(self):
         return self.__repr__()

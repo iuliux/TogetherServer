@@ -3,7 +3,7 @@ from changerequests import *
 
 
 class ConversationStarter:
-    """Factory class for Conversation objects"""
+    '''Factory class for Conversation objects'''
 
     def __init__(self, target_uri):
         self.uri = target_uri
@@ -14,10 +14,10 @@ class ConversationStarter:
 
 
 class Conversation:
-    """
+    '''
     A conversation is a sequence of one request followed by one response.
     To be produced from a ConversationStarter factory.
-    """
+    '''
 
     def __init__(self, conn, method, resource):
         self._conn = conn
@@ -28,30 +28,31 @@ class Conversation:
         self.response_headers = {}
 
     def send(self, data='', headers={}):
-        """
+        '''
         Sends the request and receives the response
         After this method finishes, response data will be available
-        """
+        '''
         data = str(data)
+        resp = None
         if self._method == 'GET':
             resp = self._conn.request_get(resource=self._resource,
-                                            args={'data': data},
-                                            headers=headers)
+                                          args={'data': data},
+                                          headers=headers)
         elif self._method == 'DELETE':
             resp = self._conn.request_delete(resource=self._resource,
-                                            body=data,
-                                            headers=headers)
+                                             body=data,
+                                             headers=headers)
         elif self._method == 'HEAD':
             resp = self._conn.request_head(resource=self._resource,
-                                            headers=headers)
+                                           headers=headers)
         elif self._method == 'POST':
             resp = self._conn.request_post(resource=self._resource,
-                                            body=data,
-                                            headers=headers)
+                                           body=data,
+                                           headers=headers)
         elif self._method == 'PUT':
             resp = self._conn.request_put(resource=self._resource,
-                                            body=data,
-                                            headers=headers)
+                                          body=data,
+                                          headers=headers)
         else:
             raise UndefinedMethodError()
 
@@ -71,6 +72,12 @@ class Conversation:
         except KeyError:
             pass
 
+    def __repr__(self):
+        return 'Conversation(' + self._method + ', ' + self._resource + ')'
+
+    def __str__(self):
+        return self.__repr__()
+
 
 class UndefinedMethodError(Exception):
     def __str__(self):
@@ -81,7 +88,7 @@ class EncodingHandler:
 
     # Response Type-to-Code
     resp_ttoc = {
-        'ok':               101,  # Generic success message
+        'ok':               200,  # Generic success message
         'generic_error':    108,  # Generic fail message
 
         # PadsManager
@@ -111,10 +118,10 @@ class EncodingHandler:
 
     @staticmethod
     def serialize_list(l):
-        """Serializes a list into a string"""
+        '''Serializes a list into a string'''
         return '>'.join(l)
 
     @staticmethod
     def deserialize_list(sl):
-        """Deserializes a serialized list"""
+        '''Deserializes a serialized list'''
         return sl.split('>')
