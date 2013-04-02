@@ -1,5 +1,10 @@
 # Collaborative editing simulation
 
+'''
+This is a proof-of-concept dummy simulation.
+It's not used anywhere in the project and can be removed.
+'''
+
 
 class ChangeRequest(object):
     INS = 1
