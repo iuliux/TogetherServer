@@ -1,7 +1,7 @@
 import cherrypy
 import time
 
-from communication import *
+from changerequests import ChangeRequest, EncodingHandler
 
 
 def time_millis():
@@ -151,6 +151,8 @@ class PadsManager(Resource):
             self.set_response_code('yes')
         else:
             self.set_response_code('no')
+        cherrypy.log('Set resp code:'+str(cherrypy.response.headers['code']))
+        return ''
 
     """?"""
     # def POST(self, **params):
