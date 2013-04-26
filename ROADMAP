@@ -25,5 +25,4 @@ O	5. Create sublime-plugin client
 :	7. Test and fix bugs
 :
 
-Next TODO: 	Exclusive access to the <send edit - get response - apply needed
-			updates - update buffer> procedure (by locks)
+Next TODO: 	Completely reimplement this!
