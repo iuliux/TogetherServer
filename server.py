@@ -1,46 +1,32 @@
-import cherrypy
 import time
-
+from twisted.internet.protocol import Protocol
 from changerequests import ChangeRequest, EncodingHandler
+
+class TogetherProtocol(Protocol):
+
+    def __init__(self, factory):
+        self.factory = factory
+
+    def connectionMade(self):
+        self.factory.numProtocols = self.factory.numProtocols + 1
+        self.transport.write(
+            'Welcome! There are currently %d open connections.\n' %
+            (self.factory.numProtocols,))
+
+    def connectionLost(self, reason):
+        self.factory.numProtocols = self.factory.numProtocols - 1
+
+    def dataReceived(self, data):
+        self.transport.write(data)
+
+
 
 
 def time_millis():
     return int(time.time() * 1000)
 
 
-class Resource(object):
-    """Template class for a resource"""
-    def __init__(self):
-        super(Resource, self).__init__()
-
-    def set_response_code(self, rsp_type='generic_error'):
-        cherrypy.response.headers['code'] = EncodingHandler.resp_ttoc[rsp_type]
-
-    def set_response_header(self, hdr, data):
-        cherrypy.response.headers[hdr] = data
-
-    def get_request_body(self):
-        return cherrypy.request.body.read()
-
-    exposed = True
-
-    def GET(self, **params):
-        pass
-
-    def HEAD(self, **params):
-        pass
-
-    def PUT(self, **params):
-        pass
-
-    def POST(self, **params):
-        pass
-
-    def DELETE(self, **params):
-        pass
-
-
-class Pad(Resource):
+class Pad(object):
 
     def __init__(self):
         self.last_mod = time_millis()
@@ -52,39 +38,32 @@ class Pad(Resource):
         # Add it's personal Users resource
         self.users = Users()
 
-    """Get all updates"""
-    def GET(self, **params):
-        try:
-            client_cr_n = int(params['data'])
-        except ValueError:
-            self.set_response_code('nan')
-            return
+    def is_update_needed(self, client_cr_n):
+        return client_cr_n < self.cr_n
 
+    def get_updates(self, client_cr_n):
+        '''
+        Get all updates
+        Return serialized list of ChangeRequest changes
+        '''
+        ser_sendback = None
         if client_cr_n < self.cr_n:
             sendback = self.crs[client_cr_n+1:self.cr_n+1]
             enc_sendback = [i_cr.serialize() for i_cr in sendback]
             ser_sendback = EncodingHandler.serialize_list(enc_sendback)
 
-            # Update client's CR number
-            self.set_response_header('new_cr_n', str(self.cr_n))
-            self.set_response_code('update_needed')
-        else:
-            ser_sendback = ''
-            self.set_response_code('ok')
-
         return ser_sendback
 
-    """Get timestamp of the latest modification"""
-    def HEAD(self, **params):
-        self.set_response_header('data', str(self.last_mod))
+    def get_last_modif(self):
+        ''' Get timestamp of the latest modification '''
+        return self.last_mod
 
-    """Edit"""
-    def PUT(self, **params):
-        encoded_edit = self.get_request_body()
+    def edit(self, encoded_edit):
+        ''' Edit '''
         cr = ChangeRequest()
         cr.deserialize(encoded_edit)
-        cherrypy.log("- EncCR: " + str(encoded_edit))
-        cherrypy.log("- CurrCR: " + str(cr))
+        print "- EncCR: " + str(encoded_edit)
+        print "- CurrCR: " + str(cr)
 
         self.last_mod = time_millis()
         self.cr_n += 1
@@ -104,74 +83,49 @@ class Pad(Resource):
             sendback = conflicts + [cr]
             enc_sendback = [i_cr.serialize() for i_cr in sendback]
             ser_sendback = EncodingHandler.serialize_list(enc_sendback)
-
-            # Update client's CR number
-            self.set_response_header('new_cr_n', str(self.cr_n))
-            self.set_response_code('update_needed')
         else:
             ser_sendback = ''
-            self.set_response_code('ok')
 
         # Add current CR to archive
         self.crs.append(cr)
-        cherrypy.log("------ CRs: " + str(self.crs))
+        print "------ CRs: " + str(self.crs)
 
         return ser_sendback
 
-    """Discard user. Decrease reference count"""
-    def DELETE(self, **params):
+    def unsubscribe_user(self, **params):
+        ''' Discard user. Decrease reference count '''
         pass
 
 
-class Users(Resource):
+class Users(object):
+    # TODO
 
     def __init__(self):
         pass
 
-    """Get a list of all users"""
     def GET(self, **params):
+        ''' Get a list of all users '''
         return "GET"
 
-    """Get the _total_ number of users"""
     def HEAD(self, **params):
+        ''' Get the _total_ number of users '''
         pass
 
-    """Change the name of the requester"""
     def PUT(self, **params):
+        ''' Change the name of the requester '''
         pass
 
 
-class PadsManager(Resource):
+class PadsManager(object):
     def __init__(self):
-        super(Resource, self).__init__()
+        self.pads = {}
 
-    """Check if pad exists"""
-    def GET(self, **params):
-        if hasattr(self, params['data']):
-            self.set_response_code('yes')
+    def create_pad(self, pad_uri):
+        ''' Create pad '''
+        if pad_uri in self.pads:
+            return 'pad_already_exists'
         else:
-            self.set_response_code('no')
-        cherrypy.log('Set resp code:'+str(cherrypy.response.headers['code']))
-        return ''
-
-    """?"""
-    # def POST(self, **params):
-    #     pass
-
-    """Create pad"""
-    def PUT(self, **params):
-        pad_uri = self.get_request_body()
-        try:
-            getattr(self, pad_uri)
-            # Send appropriate error code
-            self.set_response_code('pad_already_exists')
-            return
-        except AttributeError:
-            setattr(self, pad_uri, Pad())
-            self.set_response_code('ok')
-            return
+            self.pads[pad_uri] = Pad()
+            return 'ok'
 
 root = PadsManager()
-
-
-cherrypy.quickstart(root, '/', 'server.conf')
