@@ -43,8 +43,3 @@ The plan
 The plan now is to completely replace the server and change the communication
 protocol from HTTP to (probably) WebSockets. Options are Node.js (which needs
 complete reimplementation) or Tornado.
-
-
----
-
-Iulius Curt 2013
