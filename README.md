@@ -23,7 +23,7 @@ Configs are done only on the first use.
 Consistency Model
 -----------------
 
-The system guarantees *secvential consistency*. This means that all clients
+The system guarantees *sequential consistency*. This means that all clients
 will commit edits in the same order, although this order may vary from the
 absolute cronological order of edits, due to different message propagation
 times.
